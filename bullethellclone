@@ -31,6 +31,10 @@ imp3 = pygame.image.load(os.path.join("images", "5.png"))
 enemypicture = pygame.image.load(os.path.join("images", "Corvette", "enemynormal.png" ))
 enemybullet = pygame.image.load((os.path.join("images", "Corvette", "enemybullet.png" )))
 destroyedenemy = pygame.image.load((os.path.join("images", "Corvette", "destroyedenemy.png" )))
+multiplier = pygame.image.load((os.path.join("images", "Corvette", "multiplier.png" )))
+lazerspeedup = pygame.image.load((os.path.join("images", "Corvette", "lazerspeedup.png" )))
+doublelazers = pygame.image.load((os.path.join("images", "Corvette", "doublelazers.png" )))
+ 
 
 def playertracking(image, topleft):
      mx, my = pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]
@@ -54,19 +58,29 @@ def playertracking(image, topleft):
 
 
 def enemydirection(x,y):
-  if x < pygame.mouse.get_pos()[0]:
+  if y < 50 or y> 274:
+       directionB = random.choice(['bLeft', 'left'])
+       return directionB  
+  elif y>314:
+       directionB = random.choice(['bRight', 'right'])
+       return directionB  
+  elif x > 540:
+       directionIn = 'forward'
+       return directionIn
+  elif x < pygame.mouse.get_pos()[0] +30:
      directionB = random.choice(['bLeft', 'bRight', 'back'])
      return directionB   
-  elif math.sqrt((abs(pygame.mouse.get_pos()[0] - x)^2) + ((abs(pygame.mouse.get_pos()[1] - y)^2))) < 10:
-     valBackRight = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+7))^2) + ((abs(pygame.mouse.get_pos()[1] - (y+7))^2)))
-     valBAckLeft = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+10))^2) + ((abs(pygame.mouse.get_pos()[1] - y)^2)))
-     valBack = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+7))^2) + ((abs(pygame.mouse.get_pos()[1] - (y-7))^2)))
-     if valBackRight >= valBAckLeft or valBack:
+  elif math.sqrt((abs(pygame.mouse.get_pos()[0] - x)^2) + ((abs(pygame.mouse.get_pos()[1] - y)^2))) < 12:
+     directionB = random.choice(['bLeft', 'bRight', 'back'])
+     """ valBackRight = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+1))^2) + ((abs(pygame.mouse.get_pos()[1] - (y+1))^2)))
+     valBAckLeft = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+2))^2) + ((abs(pygame.mouse.get_pos()[1] - y)^2)))
+     valBack = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+1))^2) + ((abs(pygame.mouse.get_pos()[1] - (y-1))^2))) """
+     """ if valBackRight > valBAckLeft or valBack:
           return "bRight"
-     elif valBAckLeft >= valBack:
+     elif valBAckLeft > valBack:
           return "bLeft"
      else:
-          return "back"
+          return "back" """
      
   else:
      directionIn = random.choice(['left', 'right', 'forward'])
@@ -147,7 +161,7 @@ def main():
                          print("jdnc")
                          if first == False:
                               for i in range(4):
-                                   enemies.append([571, random.randint(24, 300), 3, time.time_ns()/1000000])
+                                   enemies.append([571, random.randint(50, 274), 3, time.time_ns()/1000000])
                               first = True
 
           if event.type == 25:
@@ -160,8 +174,8 @@ def main():
                lowertrans = False
 
     font = pygame.font.Font('freesansbold.ttf', 32)
-    text = font.render(str(score), True, white, None)
-    text1 = font.render(str(health), True, white, None)
+    text = font.render("score: " + str(score), True, white, None)
+    text1 = font.render("health: " + str(health), True, white, None)
 
     pygame.draw.rect(display, white, pygame.Rect(10, 282, 32, 32))
 
@@ -194,7 +208,7 @@ def main():
     for enemy in enemies[:]:
          if enemy[2]<= 0:
               score += 10
-              destroyedenemies.append([enemy[0], enemy[1], 256])
+              #destroyedenemies.append([enemy[0], enemy[1], 256])
               enemies.remove(enemy)           
               pygame.mixer.Sound.play(pygame.mixer.Sound("music and fx/hq-explosion-6288 (1).mp3"),0,0,0)
          elif enemy[1] > 348 or enemy[1] < 0:
@@ -329,7 +343,11 @@ def main():
    
 
     display.blit(text, [0,0])
-    display.blit(text1, [100,292])
+    display.blit(text1, [130,282])
+    display.blit(doublelazers, pygame.Rect(10, 282, 32, 32)) 
+    display.blit(multiplier, pygame.Rect(44, 282, 32, 32)) 
+    display.blit(lazerspeedup, pygame.Rect(78, 282, 32, 32)) 
+
     #pygame.draw.rect(display, white, pygame.Rect(10, 282, 32, 32))
     pygame.display.update()
     clock.tick(fps)
