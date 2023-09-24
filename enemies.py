@@ -169,7 +169,7 @@ def main():
           bullets[b][0] += 5
 
     for b in range(len(enemybulls)):
-          enemybulls[b][0] -= 2      
+          enemybulls[b][0] -= 10     
   
 
     for bullet in bullets[:]:
@@ -206,8 +206,8 @@ def main():
       
     display.blit(imp, (0, 0))
     
-    scroll = scroll - 0.5
-    scroll1 = scroll1 - 0.5
+    scroll = scroll - 0.1
+    scroll1 = scroll1 - 0.1
     img1(imp1,scroll,scroll1)
     if(scroll<= -(display.get_width())):
          scroll = 0

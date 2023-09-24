@@ -87,12 +87,13 @@ def enemydirection(x,y):
      return directionIn
   
 
-class enemy(pygame.sprite.Sprite):
-     def __init__(self, x,y, image, health, timer, angle):
+class Enemy(pygame.sprite.Sprite):
+     def __init__(self, x,y, image, health, timer, speed):
           pygame.sprite.Sprite.__init__(self)
           self.x = x
-          self.rect = image.get_rect()
           self.y = y
+          self.rect = image.get_rect
+          self.center1 = image.get_rect(topleft = (self.x, self.y)).center
           self.turnedimage = image
           
           self.health = health
@@ -123,8 +124,8 @@ class enemy(pygame.sprite.Sprite):
                          return "back" """
      
                else:
-                    directionIn = random.choice(['left', 'right', 'forward'])
-                    return directionIn
+                    directionB = random.choice(['left', 'right', 'forward'])
+                    return directionB
                
                if directionB == "left":
                     self.rect.move_ip(-1,-1)
@@ -144,19 +145,53 @@ class enemy(pygame.sprite.Sprite):
                if iy < my:
                     if mx - ix == 0:
                          turnedimage = pygame.transform.rotate(image, 90)
-                    else:    
+                    else:  
+                         #angle = math.degrees(math.atan((abs(my - iy)/abs(mx - ix))))  
                          turnedimage = pygame.transform.rotate(image, math.degrees(math.atan((abs(my - iy)/abs(mx - ix)))))
                elif iy> my:
                     if mx - ix == 0:
                          turnedimage = pygame.transform.rotate(image, -90)
                     else:    
+                         #self.angle = -math.degrees(math.atan((abs(my - iy)/abs(mx - ix))))  
                          turnedimage = pygame.transform.rotate(image, -math.degrees(math.atan((abs(my - iy)/abs(mx - ix)))))
                else:
                     turnedimage = pygame.transform.rotate(image, 0)
-               turnedimagerect = turnedimage.get_rect(center = self.rect.center)
-               self.image = turnedimage
-               self.rect = turnedimagerect
+               turnedimagerect = turnedimage.get_rect(center = image.get_rect(topleft = (x,y)).center)
+               return turnedimage, turnedimagerect
+               
 
+class enemybullets(Enemy):
+     def __init__(self, angle, image, x, y, speed):
+          pass
+     
+
+class Button(pygame.sprite.Sprite):
+     def __init__(self, x,y, colour, text, height, width):
+          pygame.sprite.Sprite.__init__(self)
+          self.x = x
+          self.y = y
+          self.colour = colour
+          self.text = text
+          self.width = width
+          self.height = height
+          self.image = pygame.Surface((self.width,self.height))
+          self.rect = pygame.Rect(self.x,self.y, self.width,self.height)
+          
+          def drew(self, display, outline):
+               if outline:
+                    pygame.draw.rect(display, outline, (self.x-2,self.y-2, self.width +4, self.height+4), 0)
+
+               pygame.draw.rect(display, self.colour, (self.x,self.y, self.width , self.height), 0)    
+
+               if self.text != "":
+                    font = pygame.font.Font('freesansbold.ttf', 12)
+                    text = font.render(self.text,1,(0,0,0))
+                    display.blit(text, (self.x +(self.x/2-text.get_width()/2), self.y+(self.y/2-text.get_height()/2)))
+
+          def mousehover(self, mousepos):
+               if pygame.Rect(self.x,self.y,self.width,self.height).collidepoint(mousepos)==True:
+                    return True
+                    
 
 
 def img1(scroll, scroll1,scroll3,scroll4,scroll5,scroll6):
@@ -207,21 +242,18 @@ def main():
   enemycooldown = False 
   lowertrans = False
   score =0
-  
-  
+  displaybuttons = True
+  buttondistance = 0
   health = 100
   
 #   shot = pygame.mixer.Sound("shot.wav")
 #   gamemusic = pygame.mixer.Sound("gamemusic.wav")
   gunspeed = 10 
+  enemyspeed=1
 
-  # different scroll values so that the differnt images can move at different speed to give a more realistic effect of movement 
-  scroll = 0
-  scroll1 = display.get_width()
-  scroll3 = 0
-  scroll4 = display.get_width()
-  scroll5 = 0
-  scroll6 = display.get_width()
+  # group of enemies declared
+  enemys = pygame.sprite.Group()
+  buttons = pygame.sprite.Group()
 
   pygame.display.set_caption('Shooting game')
   #while loop that runs while the condition is met
@@ -258,6 +290,9 @@ def main():
                          if first == False:
                               for i in range(4):
                                    enemies.append([571, random.randint(50, 274), 3, time.time_ns()/1000000])
+                                   enemys.add( Enemy(571, random.randint(50, 274), enemypicture, 3, time.time_ns(), 1 ))
+                                   
+
                               first = True
 
           if event.type == 25:
@@ -268,6 +303,13 @@ def main():
           
           if event.type == 28:
                lowertrans = False
+
+    scroll = 0
+    scroll1 = display.get_width()
+    scroll3 = 0
+    scroll4 = display.get_width()
+    scroll5 = 0
+    scroll6 = display.get_width()
 
     font = pygame.font.Font('freesansbold.ttf', 32)
     text = font.render("score: " + str(score), True, white, None)
@@ -311,17 +353,16 @@ def main():
               enemies.remove(enemy)    
 
     img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)
-    """ scroll = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[0]
+    """scroll = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[0]
     scroll1 = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[1]
     scroll3 = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[2]
     scroll4 = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[3]
     scroll5 = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[4]
-    scroll6 = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[5] """
-
+    scroll6 = img1(scroll,scroll1,scroll3, scroll4,scroll5,scroll6)[5]"""
+    
 
     for i in bullets:
           display.blit(playerbull1, pygame.Rect(i[0],i[1], 0, 0)) 
-
     for i in enemybulls:
           display.blit(enemybullet, pygame.Rect(i[0],i[1], 0, 0))      
           
@@ -338,13 +379,15 @@ def main():
     if spaceship_clicked==True:
           display.blit(player1,(pygame.mouse.get_pos()[0]-20, pygame.mouse.get_pos()[1]-12))
           if enemycooldown == False:
-             if len(enemies)<8:
+             if len(enemys)<8:
                for i in range(random.randint(1,3)):
                   enemies.append([571, random.randint(24, 300), 3, time.time_ns()/1000000])  
+                  enemys.add( Enemy(571, random.randint(50, 274), enemypicture, 3, time.time_ns(), 1 ))
 
              for enemy in enemies:
                   if time.time_ns()/1000000 - enemy[3] > 15 :
                        enemybulls.append([enemy[0],enemy[1]])
+
                        pygame.mixer.Sound.play(pygame.mixer.Sound("music and fx/blaster-2-81267 (mp3cut.net) (1).mp3"),0,0,0)
                        enemy[3] = time.time_ns()/1000000
                        
@@ -419,8 +462,17 @@ def main():
     display.blit(doublelazers, pygame.Rect(10, 282, 32, 32)) 
     display.blit(multiplier, pygame.Rect(44, 282, 32, 32)) 
     display.blit(lazerspeedup, pygame.Rect(78, 282, 32, 32)) 
-
-    #pygame.draw.rect(display, white, pygame.Rect(10, 282, 32, 32))
+    
+    while displaybuttons == True:
+         for i in range(3):
+              buttons.add(Button(230, 150+ buttondistance, (100,2,25), "play", 20, 90))
+              buttondistance += 30
+         displaybuttons = False    
+              
+    buttons.draw(display)
+    
+    
+    
     pygame.display.update()
     clock.tick(fps)
 
