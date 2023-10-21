@@ -26,28 +26,19 @@ enemies = []
 enemybulls = []
 destroyedenemies = []
 # images used in the game
-player1 = pygame.transform.scale(pygame.image.load(
-    os.path.join("images", "Corvette", "boost4.png")), (40, 24))
-playerbull1 = pygame.image.load(os.path.join(
-    "images", "Corvette", "pixel_art.png"))
-playerbull2 = pygame.image.load(os.path.join(
-    "images", "Corvette", "pixel_art.png"))
+player1 = pygame.transform.scale(pygame.image.load(os.path.join("images", "Corvette", "boost4.png")), (40, 24))
+playerbull1 = pygame.image.load(os.path.join("images", "Corvette", "pixel_art.png"))
+playerbull2 = pygame.image.load(os.path.join("images", "Corvette", "pixel_art.png"))
 imp = pygame.image.load(os.path.join("images", "1.png"))
 imp1 = pygame.image.load(os.path.join("images", "2.png"))
 imp2 = pygame.image.load(os.path.join("images", "3.png"))
 imp3 = pygame.image.load(os.path.join("images", "5.png"))
-enemypicture = pygame.image.load(os.path.join(
-    "images", "Corvette", "enemynormal.png"))
-enemybullet = pygame.image.load(
-    (os.path.join("images", "Corvette", "enemybullet.png")))
-destroyedenemy = pygame.image.load(
-    (os.path.join("images", "Corvette", "destroyedenemy.png")))
-multiplier = pygame.image.load(
-    (os.path.join("images", "Corvette", "multiplier.png")))
-lazerspeedup = pygame.image.load(
-    (os.path.join("images", "Corvette", "lazerspeedup.png")))
-doublelazers = pygame.image.load(
-    (os.path.join("images", "Corvette", "doublelazers.png")))
+enemypicture = pygame.image.load(os.path.join("images", "Corvette", "enemynormal.png"))
+enemybullet = pygame.image.load((os.path.join("images", "Corvette", "enemybullet.png")))
+destroyedenemy = pygame.image.load((os.path.join("images", "Corvette", "destroyedenemy.png")))
+multiplier = pygame.image.load((os.path.join("images", "Corvette", "multiplier.png")))
+lazerspeedup = pygame.image.load((os.path.join("images", "Corvette", "lazerspeedup.png")))
+doublelazers = pygame.image.load((os.path.join("images", "Corvette", "doublelazers.png")))
 
 
 def playertracking(image, topleft):
@@ -73,7 +64,7 @@ def playertracking(image, topleft):
 
 
 def enemydirection(x, y):
-    if y < 50 or y > 274:
+    if y < 50 :
         directionB = random.choice(['bLeft', 'left'])
         return directionB
     elif y > 314:
@@ -107,26 +98,25 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
+        self.image = image
         self.turnedimage = image
-        self.rect = self.turnedimage.get_rect
-        self.center1 = self.turnedimage.get_rect(
-            topleft=(self.x, self.y)).center
+        self.rect = self.turnedimage.get_rect()
+        self.center1 = self.turnedimage.get_rect(topleft=(self.x, self.y)).center
         self.health = health
         self.timer = time.time()
+        self.angle = 0
+        self.ix, self.iy = self.turnedimage.get_rect(topleft=(self.x, self.y)).center
 
-    def update(self):
-        if self.y < 50 or self.y > 274:
+    def upd(self):
+        if self.y > 314 :
             directionB = random.choice(['bLeft', 'left'])
-        elif self.y > 314:
+        elif self.y < 50:
             directionB = random.choice(['bRight', 'right'])
-            return directionB
         elif self.x > 540:
             directionB = 'forward'
-            return directionB
         elif self.x < pygame.mouse.get_pos()[0] + 30:
-            directionB = random.choice(['bLeft', 'bRight', 'back'])
-            return directionB
-        elif math.sqrt((abs(pygame.mouse.get_pos()[0] - self.x) ^ 2) + ((abs(pygame.mouse.get_pos()[1] - self.y) ^ 2))) < 12:
+            directionB = random.choice(['back'])
+        elif math.sqrt((abs(pygame.mouse.get_pos()[0] - self.x) ^ 2) + ((abs(pygame.mouse.get_pos()[1] - self.y) ^ 2))) < 10:
             directionB = random.choice(['bLeft', 'bRight', 'back'])
             """ valBackRight = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+1))^2) + ((abs(pygame.mouse.get_pos()[1] - (y+1))^2)))
                     valBAckLeft = math.sqrt((abs(pygame.mouse.get_pos()[0] - (x+2))^2) + ((abs(pygame.mouse.get_pos()[1] - y)^2)))
@@ -140,50 +130,98 @@ class Enemy(pygame.sprite.Sprite):
 
         else:
             directionB = random.choice(['left', 'right', 'forward'])
-            return directionB
 
         if directionB == "left":
-            self.rect.move_ip(-1, -1)
+            self.x -= 1
+            self.y -= 1
         elif directionB == "right":
-            self.rect.move_ip(-1, 1)
+            self.x -= 1
+            self.y += 1
         elif directionB == "forward":
-            self.rect.move_ip(-2, 0)
+            self.x -= 2
         elif directionB == "bLeft":
-            self.rect.move_ip(1, -1)
+            self.x += 1
+            self.y -= 1
         elif directionB == "bRight":
-            self.rect.move_ip(1, 1)
+            self.x += 1
+            self.y += 1
         else:
-            self.rect.move_ip(2, 0)
+            self.x += 2
 
+        self.ix, self.iy = self.turnedimage.get_rect(topleft=(self.x, self.y)).center
+
+     
+    def show(self):
         mx, my = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
-        ix, iy = self.rect.center
+        ix, iy = self.turnedimage.get_rect(topleft=(self.x, self.y)).center
+        if mx - ix != 0:
+            self.angle = math.degrees(math.atan((abs(my - iy)/abs(mx - ix))))
         if iy < my:
             if mx - ix == 0:
-                self.turnedimage = pygame.transform.rotate(
-                    self.turnedimage, 90)
+                self.turnedimage = pygame.transform.rotate(self.image, 90)
             else:
                 # angle = math.degrees(math.atan((abs(my - iy)/abs(mx - ix))))
-                self.turnedimage = pygame.transform.rotate(
-                    self.turnedimage, math.degrees(math.atan((abs(my - iy)/abs(mx - ix)))))
+                self.turnedimage = pygame.transform.rotate(self.image, self.angle)
         elif iy > my:
             if mx - ix == 0:
-                self.turnedimage = pygame.transform.rotate(
-                    self.turnedimage, -90)
+                self.turnedimage = pygame.transform.rotate(self.image, -90)
             else:
                 # self.angle = -math.degrees(math.atan((abs(my - iy)/abs(mx - ix))))
-                self.turnedimage = pygame.transform.rotate(
-                    self.turnedimage, -math.degrees(math.atan((abs(my - iy)/abs(mx - ix)))))
+                self.turnedimage = pygame.transform.rotate(self.image, -self.angle)
         else:
-            self.turnedimage = pygame.transform.rotate(self.turnedimage, 0)
-        self.rect = self.turnedimage.get_rect(
-            center=self.turnedimage.get_rect(topleft=(self.x, self.y)).center)
-
+            self.turnedimage = pygame.transform.rotate(self.image, 0) 
+        self.rect = self.turnedimage.get_rect(center= (ix,iy))
         display.blit(self.turnedimage, self.rect)
 
 
-class enemybullets(Enemy):
-    def __init__(self, angle, image, x, y, speed):
-        pass
+class enemybullets(pygame.sprite.Sprite):
+    def __init__(self, e, image):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.turnedimage = image 
+        self.angle = e.angle
+        self.center1 = e.center1
+        self.velx = 0
+        self.vely = 0
+        mx, my = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
+        self.ix = e.ix
+        self.iy = e.iy
+        if self.iy < my:
+            if mx - self.ix == 0:
+                self.turnedimage = pygame.transform.rotate(self.image, 90)
+                self.velx = math.cos(self.angle)
+                self.vely = math.sin(self.angle)
+            else:
+                self.turnedimage = pygame.transform.rotate(self.image, self.angle)
+                self.velx = math.cos(180-self.angle)
+                self.vely = math.sin(self.angle)
+        elif self.iy > my:
+            if mx - self.ix == 0:
+                self.turnedimage = pygame.transform.rotate(self.image, -90)
+                self.velx = math.cos(self.angle)
+                self.vely = math.sin(self.angle)
+            else:
+                self.turnedimage = pygame.transform.rotate(self.image, -self.angle)
+                self.velx = math.cos(180-self.angle)
+                self.vely = -math.sin(self.angle)
+        else:
+            self.turnedimage = pygame.transform.rotate(self.image, 0) 
+            self.velx = math.cos(self.angle)
+            self.vely = math.sin(self.angle)
+
+    def movebullet(self):
+        
+        self.ix += self.velx   
+        self.iy += self.vely 
+        if self.ix < 0 - (self.image.get_width()/2) or self.iy > windowHeight +(self.image.get_width()/2) or self.iy < 0 -(self.image.get_width()/2):
+            self.kill()
+
+    def drawbullet(self):
+        display.blit(self.turnedimage, self.turnedimage.get_rect(center= (self.ix,self.iy)))
+
+
+        
+
 
 
 class Button():
@@ -197,24 +235,30 @@ class Button():
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.rectcenter = self.rect.center
         self.scale = scale
+        self.scale1 = scale
+        self.scale2 =scale
 
     def draw(self):
-        outlinerect = (self.x-2, self.y-2, self.width + 4, self.height+4)
-        pygame.draw.rect(display, (255, 255, 255), outlinerect, 0, 5)
-        pygame.draw.rect(display, self.colour, self.rect, 0, 5)
+        outlinerect = pygame.Rect(self.x-2, self.y-2, self.width + 5, self.height+4)
+        pygame.draw.rect(display, (255, 255, 255), outlinerect.scale_by(self.scale2,self.scale2), 0, 5)
+        pygame.draw.rect(display, self.colour, self.rect.scale_by(self.scale1,self.scale1), 0, 5)
 
         if self.text != "":
             font = pygame.font.Font('freesansbold.ttf', 12)
-            text = font.render(self.text, 1, (255, 255, 255))
-            display.blit(text, (self.x + ((self.width/2)-(text.get_width()/2)),
-                         self.y+((self.height/2)-(text.get_height()/2))))
+            text = font.render(self.text, True, (255, 255, 255))
+            display.blit(text, (self.x + ((self.width/2)-(text.get_width()/2)), self.y+((self.height/2)-(text.get_height()/2))))
 
     def mousehover(self, mousepos):
         if self.rect.collidepoint(mousepos) == True:
-            self.scale = 0.8
+            print("hjkjbojb")
+            self.scale1 = 0.9
+            self.scale2 = 0.92
             if pygame.mouse.get_pressed()[0] == True:
                 return True
-
+        else:
+            
+            self.scale1 = self.scale
+            self.scale2 = self.scale
 
 def img1(x, y, z):
     display.blit(x, (y, 0))  # places the images in the x and y coords i give
@@ -234,10 +278,12 @@ def main():
     lowertrans = False
     score = 0
     play = False
-    displaybuttons = True
-
-    buttondistance = 0
+    highscores = False
+    settings = False
+    playername = "click to type"
     health = 100
+    input = False
+    scores = []*30
 
     scroll = 0
     scroll1 = display.get_width()
@@ -249,11 +295,11 @@ def main():
 
 #   shot = pygame.mixer.Sound("shot.wav")
 #   gamemusic = pygame.mixer.Sound("gamemusic.wav")
-    gunspeed = 10
-    enemyspeed = 1
+
 
     # group of enemies declared
     enemys = pygame.sprite.Group()
+    enemybullett = pygame.sprite.Group()
 
     pygame.display.set_caption('Shooting game')
     # while loop that runs while the condition is met
@@ -270,6 +316,14 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     dead = True
+                if input == True:
+                    if event.key == pygame.K_RETURN:
+                        input = False
+                    elif event.key == pygame.K_BACKSPACE:
+                        playername = playername[:-1]
+                    else:
+                        if len(playername) <13:
+                            playername += event.unicode
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # players hitbox
@@ -289,7 +343,7 @@ def main():
 
                         print("jdnc")
                         if first == False:
-                            for i in range(4):
+                            for i in range(1):
                                 enemies.append([571, random.randint(50, 274), 3, time.time_ns()/1000000])
                                 enemys.add(Enemy(571, random.randint(50, 274), enemypicture, 3, time.time_ns(), 1))
 
@@ -303,6 +357,8 @@ def main():
 
             if event.type == 28:
                 lowertrans = False
+
+        #home screem. I have a bool which when true allows the main game code to run. else display the play settings and highscore button
 
         if play == False:
             display.blit(imp, (0, 0))
@@ -344,11 +400,150 @@ def main():
 
             button3 = Button(230, 230, (0, 0, 0), "highscores", 30, 90, 1)
 
+            button1.mousehover(pygame.mouse.get_pos())
+            button2.mousehover(pygame.mouse.get_pos())
+            button3.mousehover(pygame.mouse.get_pos())
             button1.draw()
             button2.draw()
             button3.draw()
             if button1.mousehover(pygame.mouse.get_pos()) == True:
               play = True
+            if button2.mousehover(pygame.mouse.get_pos()) == True:
+              settings = True
+            if button3.mousehover(pygame.mouse.get_pos()) == True:
+                highscores = True
+                file = open("scores.txt", "r")
+                for line in file:
+                  scores.append(line.split(";"))
+                file.close()
+
+
+
+        if settings == True:
+            display.blit(imp, (0, 0))
+
+            scroll = scroll - 0.1
+            scroll1 = scroll1 - 0.1
+            img1(imp1, scroll, scroll1)
+            if (scroll <= -(display.get_width())):
+                scroll = 0
+
+            if (scroll1 <= 0):
+                scroll1 = display.get_width()
+            scroll3 = scroll3 - 1
+            scroll4 = scroll4 - 1
+
+            img1(imp2, scroll3, scroll4)
+            if (scroll3 <= -(display.get_width())):
+                scroll3 = 0
+
+            if (scroll4 <= 0):
+                scroll4 = display.get_width()
+            scroll5 = scroll5 - 1.5
+            scroll6 = scroll6 - 1.5
+ 
+            img1(imp3, scroll5, scroll6)
+            if (scroll5 <= -(display.get_width())):
+                scroll5 = 0
+
+            if (scroll6 <= 0):
+                scroll6 = display.get_width()
+
+            font1 = pygame.font.Font('freesansbold.ttf', 50)
+            font2 = pygame.font.Font('freesansbold.ttf', 12)
+            text2 = font1.render("Settings and Help", True, white, None)
+            display.blit(text2, [(halfLength - (text2.get_width()/2)), 50])
+            text3 = font2.render("To control the player all you need to is move the", True, white, None)
+            text4 = font2.render("mouse. To shoot all you need to do is click rmb.", True, white, None)
+            text5 = font2.render("And to use the power ups just click", True, white, None)
+            text6 = font2.render("1, 2, 3, or 4", True, white, None)
+            display.blit(text3, [(halfLength-50), 130])
+            display.blit(text4, [(halfLength-50), 147])
+            display.blit(text5, [(halfLength-50), 164])
+            display.blit(text6, [(halfLength-50), 181])
+
+            
+            button1 = Button(100, 130, (128, 128, 128), playername, 30, 90, 1)
+ 
+            button2 = Button(100, 180, (0, 0, 0), "save name ", 30, 90, 1)
+
+            button3 = Button(100, 230, (0, 0, 0), "back", 30, 90, 1)
+
+
+            button2.mousehover(pygame.mouse.get_pos())
+            button3.mousehover(pygame.mouse.get_pos())
+            button1.draw()
+            button2.draw()
+            button3.draw()
+            if button3.mousehover(pygame.mouse.get_pos()) == True:
+              settings=False
+              input = False
+            if button1.mousehover(pygame.mouse.get_pos()) == True:
+              settings = True
+              playername = ""
+              input = True
+            if button2.mousehover(pygame.mouse.get_pos()) == True:
+              input = False
+              file = open("currentplayer.txt", "w")
+              file.write(playername)
+              file.close()
+
+        if highscores == True:
+            display.blit(imp, (0, 0))
+
+            scroll = scroll - 0.1
+            scroll1 = scroll1 - 0.1
+            img1(imp1, scroll, scroll1)
+            if (scroll <= -(display.get_width())):
+                scroll = 0
+
+            if (scroll1 <= 0):
+                scroll1 = display.get_width()
+            scroll3 = scroll3 - 1
+            scroll4 = scroll4 - 1
+
+            img1(imp2, scroll3, scroll4)
+            if (scroll3 <= -(display.get_width())):
+                scroll3 = 0
+
+            if (scroll4 <= 0):
+                scroll4 = display.get_width()
+            scroll5 = scroll5 - 1.5
+            scroll6 = scroll6 - 1.5
+ 
+            img1(imp3, scroll5, scroll6)
+            if (scroll5 <= -(display.get_width())):
+                scroll5 = 0
+
+            if (scroll6 <= 0):
+                scroll6 = display.get_width()
+
+            font1 = pygame.font.Font('freesansbold.ttf', 50)
+            font2 = pygame.font.Font('freesansbold.ttf', 8)
+            text2 = font1.render("Highscores", True, white, None)
+            display.blit(text2, [(halfLength - (text2.get_width()/2)), 50])
+            
+            d=0
+            for x in range(len(scores)):  
+                pscores = font2.render(str(d+1)+"). "+ scores[x][0]+ " "+ scores[x][1], True, white, None)
+                display.blit(pscores, ( 100 , 130 + (d*10)))
+                d=d+1
+                
+            
+
+                    
+
+
+            button3 = Button(24, 278, (0, 0, 0), "back", 30, 90, 1) 
+            button3.mousehover(pygame.mouse.get_pos())   
+            button3.draw()
+            if button3.mousehover(pygame.mouse.get_pos()) == True:
+                highscores = False
+
+            
+            
+
+        
 
         for b in range(len(bullets)):
             bullets[b][0] += 5
@@ -370,18 +565,17 @@ def main():
                     enemy[2] -= 1
                     bullets.remove(bullet)
 
-        for b in enemybulls:
+        """ for b in enemybulls:
             if player1.get_rect(topleft=(pygame.mouse.get_pos()[0]-20, pygame.mouse.get_pos()[1]-12)).colliderect(enemybullet.get_rect(topleft=(b[0], b[1]))) == True:
                 health -= 2
-                enemybulls.remove(b)
+                enemybulls.remove(b) """
 
         for enemy in enemies[:]:
             if enemy[2] <= 0:
                 score += 10
                 # destroyedenemies.append([enemy[0], enemy[1], 256])
                 enemies.remove(enemy)
-                pygame.mixer.Sound.play(pygame.mixer.Sound(
-                    "music and fx/hq-explosion-6288 (1).mp3"), 0, 0, 0)
+                pygame.mixer.Sound.play(pygame.mixer.Sound("music and fx/hq-explosion-6288 (1).mp3"), 0, 0, 0)
             elif enemy[1] > 348 or enemy[1] < 0:
                 enemies.remove(enemy)
 
@@ -429,6 +623,18 @@ def main():
             if (scroll6 <= 0):
                 scroll6 = display.get_width()
 
+            if spaceship_clicked == False:
+                font = pygame.font.Font('freesansbold.ttf', 32)
+                text2 = font.render("click the shippppp", True, white, None)
+                display.blit(text2, [(halfLength - (text2.get_width()/2)), 50])
+                button3 = Button(24, 278, (0, 0, 0), "back", 30, 90, 1) 
+                button3.mousehover(pygame.mouse.get_pos())   
+                button3.draw()
+                if button3.mousehover(pygame.mouse.get_pos()) == True:
+                    play = False
+
+            
+
             if spaceship_clicked == True:
                 
                 
@@ -442,23 +648,30 @@ def main():
                 display.blit(multiplier, pygame.Rect(44, 282, 32, 32))
                 display.blit(lazerspeedup, pygame.Rect(78, 282, 32, 32))
                 display.blit(player1, (pygame.mouse.get_pos()[0]-20, pygame.mouse.get_pos()[1]-12))
+                
+                for e in enemys:
+                    e.upd()
+                    e.show()
+                
                 if enemycooldown == False:
-                    if len(enemys) < 8:
-                        for i in range(random.randint(1, 3)):
-                            enemies.append([571, random.randint(24, 300), 3, time.time_ns()/1000000])
+                    if len(enemys) < 5:
+                        for i in range(random.randint(1, 1)):
+                            
                             enemys.add(Enemy(571, random.randint(50, 274), enemypicture, 3, time.time_ns(), 1))
+                        
+                    for e in enemys:
+                        if time.time_ns()/1000000 - e.timer > 300:
+                            enemybullett.add(enemybullets(e, enemybullet))
 
+                            pygame.mixer.Sound.play(pygame.mixer.Sound("music and fx/blaster-2-81267 (mp3cut.net) (1).mp3"), 0, 0, 0)
+                            e.timer = time.time_ns()/1000000 
 
-                for enemy in enemies:
-                    if time.time_ns()/1000000 - enemy[3] > 300:
-                        enemybulls.append([enemy[0], enemy[1]])
-                        pygame.mixer.Sound.play(pygame.mixer.Sound("music and fx/blaster-2-81267 (mp3cut.net) (1).mp3"), 0, 0, 0)
-                        enemy[3] = time.time_ns()/1000000
+                        
+                    
+                    pygame.time.set_timer(26, 800)
+                    enemycooldown = True
 
-                pygame.time.set_timer(26, 800)
-                enemycooldown = True
-
-                enemys.update()
+                """ enemys.update()
                 enemy1 = Enemy(571, random.randint(50, 274),enemypicture, 3, time.time_ns(), 1)
                 enemy1.update()
 
@@ -496,7 +709,8 @@ def main():
                     else:
                         enemy[0] += 2
 
-                        display.blit(playertracking(enemypicture, (enemy[0], enemy[1]))[0], playertracking(enemypicture, (enemy[0], enemy[1]))[1])
+                        display.blit(playertracking(enemypicture, (enemy[0], enemy[1]))[0], playertracking(enemypicture, (enemy[0], enemy[1]))[1]) """
+                
 
                 if pygame.mouse.get_pressed()[0]:
 
@@ -515,8 +729,11 @@ def main():
 
             for i in bullets:
                 display.blit(playerbull1, pygame.Rect(i[0], i[1], 0, 0))
-            for i in enemybulls:
-                display.blit(enemybullet, pygame.Rect(i[0], i[1], 0, 0))
+            for b in enemybullett:
+                b.movebullet()
+                b.drawbullet()
+            """for i in enemybulls:
+                display.blit(enemybullet, pygame.Rect(i[0], i[1], 0, 0)) """
 
             for i in destroyedenemies:
                 destroyedenemy.set_alpha(i[2])
