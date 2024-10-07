@@ -148,12 +148,12 @@ def main():
                          pygame.mixer.music.play(-1,0,0)
                          pygame.mixer.Sound.play(pygame.mixer.Sound("music and fx/shoot02wav-14562 (mp3cut.net).mp3"),0,0,0)
 
-                         """ print("jdnc")
+                         print("jdnc")
                          if first == False:
                               for i in range(4):
                                    enemies.append([571, random.randint(24, 300), 3, time.time_ns()/1000000])
                               first = True
- """
+
           if event.type == 25:
                shot = False     
 
@@ -270,7 +270,7 @@ def main():
     if spaceship_clicked==True:
           display.blit(player1,(pygame.mouse.get_pos()[0]-20, pygame.mouse.get_pos()[1]-12))
           if enemycooldown == False:
-             """ if len(enemies)<8:
+             if len(enemies)<8:
                for i in range(random.randint(1,3)):
                   enemies.append([571, random.randint(24, 300), 3, time.time_ns()/1000000])  
 
@@ -278,7 +278,7 @@ def main():
                   if time.time_ns()/1000000 - enemy[3] > 15 :
                        enemybulls.append([enemy[0],enemy[1]])
                        pygame.mixer.Sound.play(pygame.mixer.Sound("music and fx/blaster-2-81267 (mp3cut.net) (1).mp3"),0,0,0)
-                       enemy[3] = time.time_ns()/1000000 """
+                       enemy[3] = time.time_ns()/1000000
                        
 
 
