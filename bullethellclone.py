@@ -301,6 +301,8 @@ class Player(pygame.sprite.Sprite):
 
     def moveplayer(self):
         self.center1 = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
+        if self.center1[0] < 0:
+            pygame.mouse.set_pos(0, pygame.mouse.get_pos()[1])
 
     def drawplayer(self):
         display.blit(self.image, self.image.get_rect(center=self.center1))
